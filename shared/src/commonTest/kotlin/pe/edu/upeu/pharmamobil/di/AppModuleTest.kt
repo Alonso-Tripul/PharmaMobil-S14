@@ -21,6 +21,22 @@ import pe.edu.upeu.pharmamobil.domain.usecase.RegistrarClienteUseCase
 import pe.edu.upeu.pharmamobil.domain.usecase.RegistrarProductoUseCase
 import pe.edu.upeu.pharmamobil.presentation.cliente.ClienteViewModel
 import pe.edu.upeu.pharmamobil.presentation.producto.ProductoViewModel
+import pe.edu.upeu.pharmamobil.data.repository.AlmacenEnMemoria
+import pe.edu.upeu.pharmamobil.data.repository.GestorPermisosFalso
+import pe.edu.upeu.pharmamobil.data.repository.NotificadorFalso
+import pe.edu.upeu.pharmamobil.data.repository.RedFalsa
+import pe.edu.upeu.pharmamobil.data.repository.RemotoFalso
+import pe.edu.upeu.pharmamobil.data.repository.TelemetriaFalsa
+import pe.edu.upeu.pharmamobil.domain.permiso.GestorPermisos
+import pe.edu.upeu.pharmamobil.domain.platform.MonitorRed
+import pe.edu.upeu.pharmamobil.domain.platform.Reloj
+import pe.edu.upeu.pharmamobil.domain.port.Notificador
+import pe.edu.upeu.pharmamobil.domain.port.Telemetria
+import pe.edu.upeu.pharmamobil.domain.repository.ProductoLocalRepository
+import pe.edu.upeu.pharmamobil.domain.repository.ProductoRemotoRepository
+import pe.edu.upeu.pharmamobil.domain.usecase.SincronizarUseCase
+import pe.edu.upeu.pharmamobil.presentation.permiso.PermisoViewModel
+import pe.edu.upeu.pharmamobil.presentation.sincronizacion.SincronizacionViewModel
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -56,6 +72,14 @@ class AppModuleTest {
             single<ProductoRepository> { ProductoRepositorioEnMemoria() }
             single<ClienteRepository> { ClienteRepositorioEnMemoria() }
             single<Compartidor> { object : Compartidor { override fun compartir(texto: String) {} } }
+            // Sesión 13: dobles de lo que cada plataforma registra en platformModule.
+            single<ProductoLocalRepository> { AlmacenEnMemoria() }
+            single<ProductoRemotoRepository> { RemotoFalso() }
+            single<Reloj> { Reloj { 0L } }
+            single<MonitorRed> { RedFalsa(inicial = false) }
+            single<Notificador> { NotificadorFalso() }
+            single<Telemetria> { TelemetriaFalsa() }
+            single<GestorPermisos> { GestorPermisosFalso() }
         })
     }.koin
 
@@ -92,6 +116,7 @@ class AppModuleTest {
         koin.get<ListarProductosUseCase>()
         koin.get<RegistrarClienteUseCase>()
         koin.get<ListarClientesUseCase>()
+        assertSame(koin.get<SincronizarUseCase>(), koin.get<SincronizarUseCase>())
     }
 
     @Test
@@ -102,5 +127,7 @@ class AppModuleTest {
         koin.get<DetalleProductoViewModel>()
         koin.get<ProductoViewModel>()
         koin.get<ClienteViewModel>()
+        koin.get<SincronizacionViewModel>()
+        koin.get<PermisoViewModel>()
     }
 }
