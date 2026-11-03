@@ -1,0 +1,48 @@
+CREATE TABLE producto (
+    propietario TEXT NOT NULL,
+    id INTEGER NOT NULL,
+    nombre TEXT NOT NULL,
+    precio REAL NOT NULL,
+    stock INTEGER NOT NULL,
+    categoriaId INTEGER NOT NULL,
+    estado INTEGER NOT NULL,
+    pendiente INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY(propietario, id)
+);
+
+CREATE TABLE sesion_cache (
+    clave INTEGER NOT NULL PRIMARY KEY CHECK(clave = 1),
+    usuario TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    permisos_json TEXT NOT NULL,
+    roles_json TEXT NOT NULL
+);
+
+listarTodos:
+SELECT * FROM producto WHERE propietario = ? ORDER BY nombre ASC;
+
+listarPendientes:
+SELECT * FROM producto WHERE propietario = ? AND pendiente = 1 ORDER BY id ASC;
+
+buscar:
+SELECT * FROM producto WHERE propietario = ? AND id = ?;
+
+insertar:
+INSERT OR REPLACE INTO producto(propietario, id, nombre, precio, stock, categoriaId, estado, pendiente)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+borrar:
+DELETE FROM producto WHERE propietario = ? AND id = ?;
+
+borrarSincronizados:
+DELETE FROM producto WHERE propietario = ? AND pendiente = 0;
+
+siguienteIdLocal:
+SELECT COALESCE(MIN(id), 0) FROM producto WHERE propietario = ?;
+
+leerSesion:
+SELECT * FROM sesion_cache WHERE clave = 1;
+
+guardarSesion:
+INSERT OR REPLACE INTO sesion_cache(clave, usuario, nombre, permisos_json, roles_json)
+VALUES (1, ?, ?, ?, ?);

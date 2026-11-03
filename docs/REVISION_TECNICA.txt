@@ -1,0 +1,30 @@
+REVISIÓN ESTÁTICA (no es compilación ni prueba de dispositivo)
+
+OK — commonMain: firma y paquete de formatearSoles presentes
+OK — androidMain: firma y paquete de formatearSoles presentes
+OK — iosMain: firma y paquete de formatearSoles presentes
+OK — androidMain: registro de Compartidor presente
+OK — iosMain: registro de Compartidor presente
+OK — presentation: sin importaciones Android o UIKit
+OK — Producto.aUi: formato aplicado en presentación
+OK — Detalle: botón Compartir enlazado al ViewModel
+OK — XML, plist y catálogo TOML: estructura válida
+OK — Todos los archivos de la base móvil se conservaron
+
+Estado inicial del entorno de preparación: descarga de Gradle bloqueada; no se compiló ni se ejecutaron pruebas allí.
+Estado posterior en Windows del estudiante: ver actualización del 06/10/2026 al final.
+Compilación y ejecución iOS: pendientes de macOS/Xcode.
+Capturas Android y rama remota: verificadas posteriormente en el equipo del estudiante; ver actualización.
+
+06/10/2026: a partir del error real del estudiante, motor Android cambiado a ktor-client-android; se retira la dependencia OkHttp que exige compileSdk 37. Nueva compilación/pruebas pendientes en el equipo del estudiante.
+
+06/10/2026: corregida inferencia en la comparación de páginas de ProductoRepositorioRestTest usando List<String?> explícito. Registro del estudiante confirma que ya pasó la comprobación de metadatos SDK; nueva ejecución de pruebas pendiente.
+
+ACTUALIZACIÓN 06/10/2026 — EVIDENCIA REAL DEL ESTUDIANTE
+APK Android y testAndroidHostTest: BUILD SUCCESSFUL.
+Resumen Gradle: 54 pruebas, 0 fallos, 0 omitidas, 100 %, 0,664 s.
+Pixel 6 API 34: inventario REST, formato S/ 6.00, detalle y selector verificados.
+Error intencional por actual retirado y compilación restaurada verificados (esta última FROM-CACHE).
+Backend Java 21 y Oracle 21.3/XEPDB1 iniciado con Flyway desactivado temporalmente y Hibernate validate.
+Rama feature/expect-actual-ancajima enviada a Alonso-Tripul/PharmaMobil-S09.
+Compilación y ejecución iOS, capturas iOS e historial completo de commits pendientes de verificar.

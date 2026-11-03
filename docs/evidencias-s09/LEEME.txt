@@ -1,0 +1,3 @@
+Capturas originales del estudiante, obtenidas el 06/10/2026.
+Ver docs/EVIDENCIAS_S09.md para resultados y límites.
+03_ios_listado_soles.png y 05_ios_compartir.png pendientes; no se incluyeron imágenes simuladas.
