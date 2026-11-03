@@ -1,0 +1,10 @@
+-- Migracion de la version 1 (sesion 11) a la 2 (sesion 13).
+-- Los equipos con datos conservan sus filas; las pendientes empiezan con 0 intentos.
+ALTER TABLE producto ADD COLUMN intentos INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE producto ADD COLUMN ultimoError TEXT;
+ALTER TABLE producto ADD COLUMN claveOperacion TEXT;
+
+CREATE TABLE sync_estado (
+    propietario TEXT NOT NULL PRIMARY KEY,
+    ultimaSync INTEGER NOT NULL
+);

@@ -7,7 +7,18 @@ CREATE TABLE producto (
     categoriaId INTEGER NOT NULL,
     estado INTEGER NOT NULL,
     pendiente INTEGER NOT NULL DEFAULT 0,
+    -- Sesion 13: memoria de la cola de envio (ver 1.sqm).
+    intentos INTEGER NOT NULL DEFAULT 0,
+    ultimoError TEXT,
+    -- Clave de operacion: el servidor reconoce un POST repetido y no duplica.
+    claveOperacion TEXT,
     PRIMARY KEY(propietario, id)
+);
+
+-- Momento de la ultima sincronizacion completa, por usuario.
+CREATE TABLE sync_estado (
+    propietario TEXT NOT NULL PRIMARY KEY,
+    ultimaSync INTEGER NOT NULL
 );
 
 CREATE TABLE sesion_cache (
@@ -21,8 +32,38 @@ CREATE TABLE sesion_cache (
 listarTodos:
 SELECT * FROM producto WHERE propietario = ? ORDER BY nombre ASC;
 
-listarPendientes:
-SELECT * FROM producto WHERE propietario = ? AND pendiente = 1 ORDER BY id ASC;
+-- Los ID temporales son negativos y decrecen: -1 es el mas antiguo.
+pendientesPorEnviar:
+SELECT * FROM producto
+WHERE propietario = :propietario AND pendiente = 1 AND intentos < :maxIntentos
+ORDER BY id DESC;
+
+listarFallidas:
+SELECT * FROM producto
+WHERE propietario = :propietario AND pendiente = 1 AND intentos >= :maxIntentos
+ORDER BY id DESC;
+
+contarPendientes:
+SELECT COUNT(*) FROM producto
+WHERE propietario = :propietario AND pendiente = 1 AND intentos < :maxIntentos;
+
+contarFallidas:
+SELECT COUNT(*) FROM producto
+WHERE propietario = :propietario AND pendiente = 1 AND intentos >= :maxIntentos;
+
+sumarIntento:
+UPDATE producto SET intentos = intentos + 1, ultimoError = :ultimoError
+WHERE propietario = :propietario AND id = :id;
+
+-- Un fallo permanente agota los intentos de golpe: la fila pasa a fallidas.
+marcarFallida:
+UPDATE producto SET intentos = :maxIntentos, ultimoError = :ultimoError
+WHERE propietario = :propietario AND id = :id;
+
+-- Accion del usuario: «Reintentar ahora» devuelve las fallidas a la cola.
+reintentarFallidas:
+UPDATE producto SET intentos = 0, ultimoError = NULL
+WHERE propietario = :propietario AND pendiente = 1 AND intentos >= :maxIntentos;
 
 buscar:
 SELECT * FROM producto WHERE propietario = ? AND id = ?;
@@ -30,6 +71,10 @@ SELECT * FROM producto WHERE propietario = ? AND id = ?;
 insertar:
 INSERT OR REPLACE INTO producto(propietario, id, nombre, precio, stock, categoriaId, estado, pendiente)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+insertarPendiente:
+INSERT INTO producto(propietario, id, nombre, precio, stock, categoriaId, estado, pendiente, intentos, ultimoError, claveOperacion)
+VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0, NULL, ?);
 
 borrar:
 DELETE FROM producto WHERE propietario = ? AND id = ?;
@@ -46,3 +91,9 @@ SELECT * FROM sesion_cache WHERE clave = 1;
 guardarSesion:
 INSERT OR REPLACE INTO sesion_cache(clave, usuario, nombre, permisos_json, roles_json)
 VALUES (1, ?, ?, ?, ?);
+
+leerUltimaSync:
+SELECT ultimaSync FROM sync_estado WHERE propietario = ?;
+
+guardarUltimaSync:
+INSERT OR REPLACE INTO sync_estado(propietario, ultimaSync) VALUES (?, ?);
