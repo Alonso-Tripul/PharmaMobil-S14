@@ -42,9 +42,13 @@ class ProductoRepositorioRest(
     override suspend fun buscar(id: Long): Producto =
         cliente.get("$endpoint/$id").body<JsonObject>().aProducto()
 
-    override suspend fun registrar(producto: Producto): Producto =
+    override suspend fun registrar(producto: Producto): Producto = registrar(producto, null)
+
+    /** Con [claveOperacion], PharmaSoft reconoce un reintento y no duplica el producto. */
+    suspend fun registrar(producto: Producto, claveOperacion: String?): Producto =
         cliente.post(endpoint) {
             contentType(ContentType.Application.Json)
+            claveOperacion?.let { header(CABECERA_IDEMPOTENCIA, it) }
             setBody(producto.aSolicitud())
         }.body<JsonObject>().aProducto()
 
@@ -74,4 +78,8 @@ class ProductoRepositorioRest(
         categoriaId = getValue("categoriaId").jsonPrimitive.long,
         estado = getValue("estado").jsonPrimitive.boolean
     )
+
+    companion object {
+        const val CABECERA_IDEMPOTENCIA = "Idempotency-Key"
+    }
 }

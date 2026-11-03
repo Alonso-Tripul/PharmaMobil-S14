@@ -24,6 +24,12 @@ import pe.edu.upeu.pharmamobil.domain.usecase.RegistrarClienteUseCase
 import pe.edu.upeu.pharmamobil.domain.usecase.RegistrarProductoUseCase
 import pe.edu.upeu.pharmamobil.presentation.cliente.ClienteViewModel
 import pe.edu.upeu.pharmamobil.presentation.producto.ProductoViewModel
+import pe.edu.upeu.pharmamobil.data.repository.EnvioRepositorioRest
+import pe.edu.upeu.pharmamobil.domain.platform.Reloj
+import pe.edu.upeu.pharmamobil.domain.repository.ProductoLocalRepository
+import pe.edu.upeu.pharmamobil.domain.repository.ProductoRemotoRepository
+import pe.edu.upeu.pharmamobil.domain.usecase.SincronizarUseCase
+import pe.edu.upeu.pharmamobil.platform.RelojSistema
 
 
 val dataModule = module {
@@ -37,6 +43,10 @@ val dataModule = module {
     single { ProductoRepositorioRest(get(), get()) }
     single<ProductoRepository> { ProductoRepositorioOffline(get(), get<ProductoRepositorioRest>()) }
     single<ClienteRepository> { ClienteRepositorioEnMemoria() }
+    // Sesión 13: la cola de envío se expone al dominio por sus contratos.
+    single<ProductoLocalRepository> { get<AlmacenProductos>() }
+    single<ProductoRemotoRepository> { EnvioRepositorioRest(get()) }
+    single<Reloj> { RelojSistema }
 }
 
 val domainModule = module {
@@ -44,6 +54,8 @@ val domainModule = module {
     factory { ListarProductosUseCase(get()) }
     factory { RegistrarClienteUseCase(get()) }
     factory { ListarClientesUseCase(get()) }
+    // single: su candado debe ser el mismo para todas las pantallas.
+    single { SincronizarUseCase(get(), get(), get()) }
 }
 
 val presentationModule = module {
