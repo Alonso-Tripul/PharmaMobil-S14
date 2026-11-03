@@ -69,18 +69,6 @@ class ProductoViewModelTest {
     }
 
     @Test
-    fun muestraDatosGuardadosConAvisoCuandoFallaLaRed() = runTest {
-
-        val repositorio = FakeProductoRepository().apply {
-            fallaAlListar = IllegalStateException("Sin conexión")
-        }
-
-        val estado = nuevoViewModel(repositorio).uiState.value
-        assertEquals(ProductoUiState.Fase.SinProductos, estado.fase)
-        assertTrue(estado.avisoRed?.contains("datos guardados") == true)
-    }
-
-    @Test
     fun losErroresDeValidacionCaenEnElFormularioNoEnLaFase() = runTest {
 
         val viewModel = nuevoViewModel()

@@ -9,8 +9,6 @@ class ListarProductosUseCase(
 ) {
     fun observar(): Flow<List<Producto>> = productoRepository.observar()
 
-    suspend fun sincronizar() = productoRepository.sincronizar()
-
     suspend operator fun invoke(): Result<List<Producto>> = resultadoDe {
         productoRepository.listar()
     }

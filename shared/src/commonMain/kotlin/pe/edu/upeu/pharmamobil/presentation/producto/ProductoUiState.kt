@@ -4,9 +4,7 @@ data class ProductoUiState(
     val fase: Fase = Fase.Cargando,
     val formulario: FormularioProducto = FormularioProducto(),
     val registrando: Boolean = false,
-    val mensajeExito: String? = null,
-    val sincronizando: Boolean = false,
-    val avisoRed: String? = null
+    val mensajeExito: String? = null
 ) {
 
     /** Fases excluyentes del inventario: solo una puede estar activa. */

@@ -16,6 +16,8 @@ import pe.edu.upeu.pharmamobil.data.local.CreadorDeDriverAndroid
 import pe.edu.upeu.pharmamobil.domain.platform.AlmacenSeguro
 import pe.edu.upeu.pharmamobil.platform.AlmacenSeguroAndroid
 import pe.edu.upeu.pharmamobil.data.network.GestorSesion
+import pe.edu.upeu.pharmamobil.domain.platform.MonitorRed
+import pe.edu.upeu.pharmamobil.platform.MonitorRedAndroid
 
 actual val platformModule: Module = module {
     single<CreadorDeDriver> { CreadorDeDriverAndroid(androidContext()) }
@@ -28,4 +30,5 @@ actual val platformModule: Module = module {
         HttpClient(Android) { configurarPharmaSoft(config, almacen, gestor, debug) }
     } } onClose { it?.close() }
     single<Compartidor> { CompartidorAndroid(androidContext()) }
+    single<MonitorRed> { MonitorRedAndroid(androidContext()) }
 }

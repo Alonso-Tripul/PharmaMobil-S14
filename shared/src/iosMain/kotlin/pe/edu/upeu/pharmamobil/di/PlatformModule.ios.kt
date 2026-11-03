@@ -15,6 +15,8 @@ import pe.edu.upeu.pharmamobil.data.local.CreadorDeDriverIos
 import pe.edu.upeu.pharmamobil.domain.platform.AlmacenSeguro
 import pe.edu.upeu.pharmamobil.platform.AlmacenSeguroIos
 import pe.edu.upeu.pharmamobil.data.network.GestorSesion
+import pe.edu.upeu.pharmamobil.domain.platform.MonitorRed
+import pe.edu.upeu.pharmamobil.platform.MonitorRedIos
 
 actual val platformModule: Module = module {
     single<CreadorDeDriver> { CreadorDeDriverIos() }
@@ -27,4 +29,5 @@ actual val platformModule: Module = module {
         HttpClient(Darwin) { configurarPharmaSoft(config, almacen, gestor, debug) }
     } } onClose { it?.close() }
     single<Compartidor> { CompartidorIos() }
+    single<MonitorRed> { MonitorRedIos() }
 }

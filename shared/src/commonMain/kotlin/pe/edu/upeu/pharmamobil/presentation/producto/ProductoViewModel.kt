@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.CancellationException
 import pe.edu.upeu.pharmamobil.domain.usecase.ListarProductosUseCase
 import pe.edu.upeu.pharmamobil.domain.usecase.ProductoInvalidoException
 import pe.edu.upeu.pharmamobil.domain.usecase.RegistrarProductoUseCase
@@ -30,24 +29,8 @@ class ProductoViewModel(
                 }
             }
         }
-        cargarProductos()
-    }
-
-    /** Conserva el nombre para la recarga; la pantalla observa siempre la base local. */
-    fun cargarProductos() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(sincronizando = true, avisoRed = null) }
-            try {
-                listarProductos.sincronizar()
-                _uiState.update { it.copy(sincronizando = false) }
-            } catch (cancelado: CancellationException) {
-                throw cancelado
-            } catch (_: Exception) {
-                _uiState.update {
-                    it.copy(sincronizando = false, avisoRed = "Sin conexión o error del servidor: mostrando datos guardados")
-                }
-            }
-        }
+        // La sincronización ya no vive aquí: SincronizacionViewModel la dispara
+        // al abrir la pantalla, al volver la red y al crecer la cola.
     }
 
     fun onNombreChange(nombre: String) {

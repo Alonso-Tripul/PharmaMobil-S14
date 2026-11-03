@@ -38,16 +38,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pe.edu.upeu.pharmamobil.presentation.components.EstadoVacio
 import pe.edu.upeu.pharmamobil.presentation.components.MensajeExito
 import pe.edu.upeu.pharmamobil.presentation.components.ValidatedTextField
+import pe.edu.upeu.pharmamobil.presentation.sincronizacion.SincronizacionPanel
+import pe.edu.upeu.pharmamobil.presentation.sincronizacion.SincronizacionViewModel
 
 @Composable
 fun ProductoScreen(
     viewModel: ProductoViewModel,
     modifier: Modifier = Modifier,
     claveSesion: String = "default",
-    puedeEscribir: Boolean = true
+    puedeEscribir: Boolean = true,
+    sincronizacion: SincronizacionViewModel = koinViewModel(key = "sync-$claveSesion")
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val estadoSync by sincronizacion.estado.collectAsStateWithLifecycle()
+    val idsFallidos = estadoSync.filasFallidas.map { it.id }.toSet()
     var seleccionado by rememberSaveable { mutableStateOf<Long?>(null) }
     seleccionado?.let { id ->
         DetalleProductoScreen(
@@ -81,11 +86,13 @@ fun ProductoScreen(
             MensajeExito(it)
         }
 
-        uiState.avisoRed?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-
-        FilledTonalButton(onClick = viewModel::cargarProductos, enabled = !uiState.sincronizando) {
-            Text(if (uiState.sincronizando) "Sincronizando…" else "Sincronizar")
-        }
+        SincronizacionPanel(
+            estado = estadoSync,
+            onSincronizar = sincronizacion::sincronizarAhora,
+            onReintentarFallidas = sincronizacion::reintentarFallidas,
+            onDescartar = sincronizacion::descartar,
+            onCerrarAviso = sincronizacion::cerrarAviso
+        )
 
         EncabezadoInventario(uiState.fase)
 
@@ -129,7 +136,11 @@ fun ProductoScreen(
                             items = fase.productos,
                             key = { it.id }
                         ) { producto ->
-                            ProductoItem(producto, onAbrir = { seleccionado = producto.id })
+                            ProductoItem(
+                                producto,
+                                noEnviado = producto.id in idsFallidos,
+                                onAbrir = { seleccionado = producto.id }
+                            )
                         }
                     }
 
@@ -141,7 +152,7 @@ fun ProductoScreen(
                         colorIcono = MaterialTheme.colorScheme.error,
                         modifier = Modifier.align(Alignment.Center),
                         accion = {
-                            FilledTonalButton(onClick = viewModel::cargarProductos) {
+                            FilledTonalButton(onClick = sincronizacion::sincronizarAhora) {
                                 Text("Reintentar")
                             }
                         }
@@ -267,6 +278,7 @@ private fun EncabezadoInventario(
 @Composable
 private fun ProductoItem(
     producto: ProductoUi,
+    noEnviado: Boolean,
     onAbrir: () -> Unit
 ) {
 
@@ -316,7 +328,10 @@ private fun ProductoItem(
                 Text("Inactivo", style = MaterialTheme.typography.labelSmall)
             }
 
-            if (producto.id < 0) {
+            if (noEnviado) {
+                Text("No enviado", style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.error)
+            } else if (producto.id < 0) {
                 Text("Pendiente", style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary)
             }
