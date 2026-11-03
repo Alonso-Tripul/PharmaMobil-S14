@@ -3,6 +3,7 @@ package pe.edu.upeu.pharmamobil
 import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import pe.edu.upeu.pharmamobil.di.androidAppModule
 import pe.edu.upeu.pharmamobil.di.initKoin
 
 /**
@@ -17,6 +18,7 @@ class MainApplication : Application() {
         initKoin {
             androidLogger()
             androidContext(this@MainApplication)
+            modules(androidAppModule)
         }
     }
 }

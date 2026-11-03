@@ -29,6 +29,7 @@ import pe.edu.upeu.pharmamobil.presentation.acerca.AcercaDeScreen
 import pe.edu.upeu.pharmamobil.presentation.auth.SesionScreen
 import pe.edu.upeu.pharmamobil.presentation.cliente.ClienteScreen
 import pe.edu.upeu.pharmamobil.presentation.producto.ProductoScreen
+import pe.edu.upeu.pharmamobil.presentation.permiso.TarjetaAvisos
 import pe.edu.upeu.pharmamobil.theme.PharmaMobilTheme
 
 private data class Opcion(val screen: Screen, val titulo: String, val descripcion: String, val icono: ImageVector)
@@ -201,6 +202,8 @@ private fun InicioProfesional(sesion: Sesion, accesos: List<Opcion>, onNavegar: 
                 }
             }
         }
+        // Sesión 13: permiso nativo resuelto desde el código común.
+        TarjetaAvisos(viewModel = koinViewModel(key = "avisos-${sesion.usuario}"))
         OutlinedCard(onClick = onPerfil, shape = RoundedCornerShape(20.dp)) {
             Row(Modifier.fillMaxWidth().padding(20.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.VerifiedUser, null, tint = MaterialTheme.colorScheme.primary)

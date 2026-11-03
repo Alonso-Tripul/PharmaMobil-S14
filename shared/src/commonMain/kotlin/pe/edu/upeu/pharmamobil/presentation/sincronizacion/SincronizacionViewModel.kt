@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import pe.edu.upeu.pharmamobil.domain.platform.MonitorRed
 import pe.edu.upeu.pharmamobil.domain.platform.Reloj
+import pe.edu.upeu.pharmamobil.domain.port.Notificador
 import pe.edu.upeu.pharmamobil.domain.repository.ProductoLocalRepository
 import pe.edu.upeu.pharmamobil.domain.usecase.SincronizarUseCase
 import pe.edu.upeu.pharmamobil.domain.usecase.SincronizarUseCase.Companion.MAX_INTENTOS
@@ -26,6 +27,7 @@ class SincronizacionViewModel(
     private val local: ProductoLocalRepository,
     red: MonitorRed,
     reloj: Reloj,
+    private val notificador: Notificador,
 ) : ViewModel() {
 
     private val enCurso = MutableStateFlow(false)
@@ -82,6 +84,12 @@ class SincronizacionViewModel(
         viewModelScope.launch {
             try {
                 val resumen = sincronizar()
+                if (resumen.fallidas > 0) {
+                    notificador.avisar(
+                        if (resumen.fallidas == 1) "1 producto no se envió" else "${resumen.fallidas} productos no se enviaron",
+                        "PharmaSoft los rechazó. Abre Productos → «Revisar qué pasó» para corregirlos."
+                    )
+                }
                 aviso.value = when {
                     resumen.sesionVencida -> resumen.aviso
                     !resumen.descargado -> resumen.aviso

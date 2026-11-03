@@ -4,6 +4,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Sesion 13: MonitorRed sincroniza al volver la red. Permiso normal: no se pide. -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Sesion 13: permiso peligroso desde Android 13; se pide con GestorPermisos. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".MainApplication"

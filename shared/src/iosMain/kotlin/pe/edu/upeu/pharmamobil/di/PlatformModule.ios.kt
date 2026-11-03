@@ -16,6 +16,10 @@ import pe.edu.upeu.pharmamobil.domain.platform.AlmacenSeguro
 import pe.edu.upeu.pharmamobil.platform.AlmacenSeguroIos
 import pe.edu.upeu.pharmamobil.data.network.GestorSesion
 import pe.edu.upeu.pharmamobil.domain.platform.MonitorRed
+import pe.edu.upeu.pharmamobil.domain.permiso.GestorPermisos
+import pe.edu.upeu.pharmamobil.domain.port.Notificador
+import pe.edu.upeu.pharmamobil.platform.GestorPermisosIos
+import pe.edu.upeu.pharmamobil.platform.NotificadorIos
 import pe.edu.upeu.pharmamobil.platform.MonitorRedIos
 
 actual val platformModule: Module = module {
@@ -30,4 +34,7 @@ actual val platformModule: Module = module {
     } } onClose { it?.close() }
     single<Compartidor> { CompartidorIos() }
     single<MonitorRed> { MonitorRedIos() }
+    // En Android estos dos se registran en androidApp (necesitan la Activity).
+    single<GestorPermisos> { GestorPermisosIos() }
+    single<Notificador> { NotificadorIos() }
 }

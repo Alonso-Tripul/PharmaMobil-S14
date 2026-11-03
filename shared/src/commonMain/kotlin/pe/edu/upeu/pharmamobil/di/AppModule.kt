@@ -25,6 +25,7 @@ import pe.edu.upeu.pharmamobil.domain.usecase.RegistrarProductoUseCase
 import pe.edu.upeu.pharmamobil.presentation.cliente.ClienteViewModel
 import pe.edu.upeu.pharmamobil.presentation.producto.ProductoViewModel
 import pe.edu.upeu.pharmamobil.presentation.sincronizacion.SincronizacionViewModel
+import pe.edu.upeu.pharmamobil.presentation.permiso.PermisoViewModel
 import pe.edu.upeu.pharmamobil.data.repository.EnvioRepositorioRest
 import pe.edu.upeu.pharmamobil.domain.platform.Reloj
 import pe.edu.upeu.pharmamobil.domain.repository.ProductoLocalRepository
@@ -63,7 +64,8 @@ val presentationModule = module {
     viewModel { DetalleProductoViewModel(get(), get()) }
     viewModel { ProductoViewModel(get(), get()) }
     viewModel { ClienteViewModel(get(), get()) }
-    viewModel { SincronizacionViewModel(get(), get(), get(), get()) }
+    viewModel { SincronizacionViewModel(get(), get(), get(), get(), get()) }
+    viewModel { PermisoViewModel(get()) }
 }
 
 
