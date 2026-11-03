@@ -1,4 +1,28 @@
-# PharmaMobil — Sesión 11: autenticación JWT y persistencia offline-first
+# PharmaMobil — Sesión 13: proyecto integrador (offline-first refinado, Firebase y permisos)
+
+Rama `feature/integrador-13`, creada desde `develop`, con un commit por paso de la guía práctica N.º 13.
+
+## Sesión 13: qué se integró
+
+| Paso | Qué se hizo |
+|---|---|
+| 1 | Recorrido completo y tabla de huecos con gravedad, decisión y fecha de cierre: [`docs/sesion13/HUECOS.md`](docs/sesion13/HUECOS.md). |
+| 2 | La cola local guarda `intentos`, `ultimoError` y `claveOperacion` por fila. La migración `1.sqm` conserva los datos de la sesión 11. |
+| 3 | `SincronizarUseCase` distingue fallo transitorio (sin red, tiempo agotado, 5xx) de permanente (400, 404, 409, 403). Espera 1, 2, 4, 8 y 16 s y admite como máximo 5 intentos. Siempre sube antes de bajar. Un 401 detiene la cola sin marcar filas. |
+| 4 | Panel de sincronización en Productos con «Sin conexión · N cambios por enviar», «Actualizado hace…» y las filas fallidas, con «Reintentar ahora» y «Revisar qué pasó». Se sincroniza sola al abrir la pantalla, al volver la red y al crecer la cola. |
+| 5 | `GestorPermisos` en el código común, con sus tres estados (concedido, denegado y denegado para siempre). En Android, `PuentePermisos` conecta con la Activity. El permiso de notificaciones se resuelve desde la tarjeta de Inicio. |
+| 6 | Interfaz `Telemetria` en el dominio, implementada con Firebase Crashlytics y Analytics (GitLive 2.7.0) solo en la capa de datos de Android. |
+| 7 | Pruebas en `commonTest` con MockEngine y dobles: sincronización, ViewModel de estado y gestor de permisos falso. |
+
+En el backend, `POST /api/v1/productos` acepta la cabecera `Idempotency-Key` (migración `V4__clave_operacion_productos.sql`). Un reintento devuelve el producto ya creado en lugar de duplicarlo.
+
+**Antes de compilar:** coloca `google-services.json` (de la consola de Firebase, paquete `pe.edu.upeu.pharmamobil`) en `androidApp/`.
+
+Cómo ejecutar, probar y sacar cada evidencia: [`docs/sesion13/GUIA_SESION13.md`](docs/sesion13/GUIA_SESION13.md).
+
+---
+
+# Historial: Sesión 11 — autenticación JWT y persistencia offline-first
 
 ## Sesión 11: persistencia offline-first
 
