@@ -29,17 +29,13 @@ fun HttpClientConfig<*>.configurarPharmaSoft(config: ConfiguracionApi? = null,
                 cacheTokens = false
                 loadTokens { almacen.leerToken()?.let { BearerTokens(it, "") } }
                 sendWithoutRequest { request ->
-                    request.url.host == origen.host && request.url.port == origen.port &&
-                    request.url.protocol == origen.protocol && request.url.encodedPath.startsWith(origen.encodedPath) &&
-                    !request.url.encodedPath.endsWith("/auth/login")
+                    request.url.esMismoOrigen(origen) && !request.url.encodedPath.endsWith("/auth/login")
                 }
             }
         }
         install(createClientPlugin("PharmaOrigenSeguro") {
             on(Send) { request ->
-                if (request.url.host != origen.host || request.url.port != origen.port ||
-                    request.url.protocol != origen.protocol || !request.url.encodedPath.startsWith(origen.encodedPath) ||
-                    request.url.encodedPath.endsWith("/auth/login")) {
+                if (!request.url.esMismoOrigen(origen) || request.url.encodedPath.endsWith("/auth/login")) {
                     request.headers.remove(HttpHeaders.Authorization)
                 }
                 proceed(request)
@@ -65,4 +61,15 @@ fun HttpClientConfig<*>.configurarPharmaSoft(config: ConfiguracionApi? = null,
             }
         }
     }
+}
+
+/**
+ * URLBuilder guarda el puerto como 0 cuando la URL no lo escribe
+ * (http://host/ o https://host/), mientras que Url ya lo resuelve a 80 o 443.
+ * Compararlos tal cual quitaba el Bearer en cualquier URL sin puerto explícito.
+ */
+private fun URLBuilder.esMismoOrigen(origen: Url): Boolean {
+    val puerto = if (port == 0 || port == DEFAULT_PORT) protocol.defaultPort else port
+    return host == origen.host && puerto == origen.port && protocol == origen.protocol &&
+        encodedPath.startsWith(origen.encodedPath)
 }

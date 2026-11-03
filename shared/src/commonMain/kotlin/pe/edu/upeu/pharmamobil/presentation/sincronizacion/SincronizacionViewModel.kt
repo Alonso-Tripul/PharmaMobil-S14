@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
@@ -30,15 +31,14 @@ class SincronizacionViewModel(
     reloj: Reloj,
     private val notificador: Notificador,
     private val telemetria: Telemetria,
+    /** Hace avanzar «Actualizado hace…» sin que nadie toque la pantalla. Las pruebas pasan uno fijo. */
+    tic: Flow<Long> = ticCadaMinuto(reloj),
 ) : ViewModel() {
 
     private val enCurso = MutableStateFlow(false)
     private val aviso = MutableStateFlow<String?>(null)
 
-    /** Hace avanzar «Actualizado hace…» sin que nadie toque la pantalla. */
-    private val ahora = flow {
-        while (true) { emit(reloj.ahora()); delay(60_000) }
-    }
+    private val ahora = tic
 
     private val datosLocales = combine(
         local.observarPendientes(MAX_INTENTOS),
@@ -143,3 +143,8 @@ class SincronizacionViewModel(
 /** Se registra como error no fatal cuando PharmaSoft rechaza filas de la cola. */
 class FilasRechazadasException(cantidad: Int) :
     Exception("$cantidad fila(s) de la cola rechazada(s) por el servidor")
+
+/** Emite la hora actual al suscribirse y luego una vez por minuto. */
+fun ticCadaMinuto(reloj: Reloj): Flow<Long> = flow {
+    while (true) { emit(reloj.ahora()); delay(60_000) }
+}

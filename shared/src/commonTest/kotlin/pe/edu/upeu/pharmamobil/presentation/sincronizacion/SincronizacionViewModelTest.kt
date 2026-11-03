@@ -1,6 +1,7 @@
 package pe.edu.upeu.pharmamobil.presentation.sincronizacion
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -33,8 +34,10 @@ class SincronizacionViewModelTest {
     @BeforeTest fun instalarMain() { Dispatchers.setMain(UnconfinedTestDispatcher()) }
     @AfterTest fun restaurarMain() { Dispatchers.resetMain() }
 
+    // Reloj fijo: el tic de cada minuto de producción nunca termina y colgaría runTest.
     private fun nuevo() = SincronizacionViewModel(
-        SincronizarUseCase(local, remoto) { ahora }, local, red, { ahora }, notificador, telemetria
+        SincronizarUseCase(local, remoto) { ahora }, local, red, { ahora }, notificador, telemetria,
+        tic = flowOf(ahora)
     )
 
     @Test
