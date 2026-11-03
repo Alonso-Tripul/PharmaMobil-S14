@@ -17,3 +17,6 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+# Sesion 13: configuracion de Firebase de cada estudiante (se descarga de la consola).
+google-services.json
+GoogleService-Info.plist

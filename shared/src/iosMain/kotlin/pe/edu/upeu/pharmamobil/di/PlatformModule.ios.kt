@@ -16,6 +16,8 @@ import pe.edu.upeu.pharmamobil.domain.platform.AlmacenSeguro
 import pe.edu.upeu.pharmamobil.platform.AlmacenSeguroIos
 import pe.edu.upeu.pharmamobil.data.network.GestorSesion
 import pe.edu.upeu.pharmamobil.domain.platform.MonitorRed
+import pe.edu.upeu.pharmamobil.domain.port.Telemetria
+import pe.edu.upeu.pharmamobil.data.telemetria.TelemetriaConsola
 import pe.edu.upeu.pharmamobil.domain.permiso.GestorPermisos
 import pe.edu.upeu.pharmamobil.domain.port.Notificador
 import pe.edu.upeu.pharmamobil.platform.GestorPermisosIos
@@ -37,4 +39,5 @@ actual val platformModule: Module = module {
     // En Android estos dos se registran en androidApp (necesitan la Activity).
     single<GestorPermisos> { GestorPermisosIos() }
     single<Notificador> { NotificadorIos() }
+    single<Telemetria> { TelemetriaConsola() }
 }

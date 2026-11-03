@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import pe.edu.upeu.pharmamobil.domain.platform.MonitorRed
 import pe.edu.upeu.pharmamobil.domain.platform.Reloj
 import pe.edu.upeu.pharmamobil.domain.port.Notificador
+import pe.edu.upeu.pharmamobil.domain.port.Telemetria
 import pe.edu.upeu.pharmamobil.domain.repository.ProductoLocalRepository
 import pe.edu.upeu.pharmamobil.domain.usecase.SincronizarUseCase
 import pe.edu.upeu.pharmamobil.domain.usecase.SincronizarUseCase.Companion.MAX_INTENTOS
@@ -28,6 +29,7 @@ class SincronizacionViewModel(
     red: MonitorRed,
     reloj: Reloj,
     private val notificador: Notificador,
+    private val telemetria: Telemetria,
 ) : ViewModel() {
 
     private val enCurso = MutableStateFlow(false)
@@ -84,7 +86,22 @@ class SincronizacionViewModel(
         viewModelScope.launch {
             try {
                 val resumen = sincronizar()
+                // Solo conteos: ni nombres de productos ni datos del usuario.
+                telemetria.registrarEvento(
+                    "sync_completada",
+                    mapOf(
+                        "enviadas" to resumen.enviadas.toString(),
+                        "fallidas" to resumen.fallidas.toString(),
+                        "pendientes" to resumen.pendientes.toString(),
+                        "descargado" to resumen.descargado.toString(),
+                    )
+                )
                 if (resumen.fallidas > 0) {
+                    // No fatal en Crashlytics: el motivo detallado queda en el equipo (ultimoError).
+                    telemetria.registrarError(
+                        FilasRechazadasException(resumen.fallidas),
+                        mapOf("pantalla" to "productos", "operacion" to "sincronizar")
+                    )
                     notificador.avisar(
                         if (resumen.fallidas == 1) "1 producto no se envió" else "${resumen.fallidas} productos no se enviaron",
                         "PharmaSoft los rechazó. Abre Productos → «Revisar qué pasó» para corregirlos."
@@ -98,7 +115,8 @@ class SincronizacionViewModel(
                 }
             } catch (cancelado: CancellationException) {
                 throw cancelado
-            } catch (_: Exception) {
+            } catch (error: Exception) {
+                telemetria.registrarError(error, mapOf("pantalla" to "productos", "operacion" to "sincronizar"))
                 aviso.value = "No se pudo sincronizar. Se muestran los datos guardados."
             } finally {
                 enCurso.value = false
@@ -121,3 +139,7 @@ class SincronizacionViewModel(
         aviso.value = null
     }
 }
+
+/** Se registra como error no fatal cuando PharmaSoft rechaza filas de la cola. */
+class FilasRechazadasException(cantidad: Int) :
+    Exception("$cantidad fila(s) de la cola rechazada(s) por el servidor")

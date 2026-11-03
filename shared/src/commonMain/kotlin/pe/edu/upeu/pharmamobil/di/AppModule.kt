@@ -64,8 +64,8 @@ val presentationModule = module {
     viewModel { DetalleProductoViewModel(get(), get()) }
     viewModel { ProductoViewModel(get(), get()) }
     viewModel { ClienteViewModel(get(), get()) }
-    viewModel { SincronizacionViewModel(get(), get(), get(), get(), get()) }
-    viewModel { PermisoViewModel(get()) }
+    viewModel { SincronizacionViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { PermisoViewModel(get(), get()) }
 }
 
 

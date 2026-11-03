@@ -9,10 +9,12 @@ import kotlinx.coroutines.launch
 import pe.edu.upeu.pharmamobil.domain.permiso.EstadoPermiso
 import pe.edu.upeu.pharmamobil.domain.permiso.GestorPermisos
 import pe.edu.upeu.pharmamobil.domain.permiso.Permiso
+import pe.edu.upeu.pharmamobil.domain.port.Telemetria
 
 /** Estado del permiso de notificaciones, que la app usa para avisar de productos no enviados. */
 class PermisoViewModel(
     private val gestor: GestorPermisos,
+    private val telemetria: Telemetria,
     private val permiso: Permiso = Permiso.NOTIFICACIONES,
 ) : ViewModel() {
 
@@ -26,7 +28,14 @@ class PermisoViewModel(
 
     /** Solo después de que la tarjeta explicó para qué se pide. */
     fun solicitar() {
-        viewModelScope.launch { _estado.value = gestor.solicitar(permiso) }
+        viewModelScope.launch {
+            val resultado = gestor.solicitar(permiso)
+            _estado.value = resultado
+            telemetria.registrarEvento(
+                "permiso_respuesta",
+                mapOf("permiso" to permiso.name, "estado" to (resultado::class.simpleName ?: "?"))
+            )
+        }
     }
 
     fun abrirAjustes() = gestor.abrirAjustes()

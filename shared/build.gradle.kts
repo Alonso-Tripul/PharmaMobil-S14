@@ -57,6 +57,11 @@ kotlin {
             implementation(libs.compose.uiTooling)
             // api: MainApplication (androidApp) usa androidContext() al arrancar Koin.
             api(libs.koin.android)
+            // Sesion 13: el SDK de Firebase solo entra por la capa de datos de Android.
+            // En iOS exigiría enlazar los frameworks nativos de Firebase en Xcode;
+            // hasta configurarlos, iOS usa TelemetriaConsola.
+            implementation(libs.gitlive.firebase.crashlytics)
+            implementation(libs.gitlive.firebase.analytics)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)

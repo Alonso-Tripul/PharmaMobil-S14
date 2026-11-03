@@ -17,6 +17,8 @@ import pe.edu.upeu.pharmamobil.domain.platform.AlmacenSeguro
 import pe.edu.upeu.pharmamobil.platform.AlmacenSeguroAndroid
 import pe.edu.upeu.pharmamobil.data.network.GestorSesion
 import pe.edu.upeu.pharmamobil.domain.platform.MonitorRed
+import pe.edu.upeu.pharmamobil.domain.port.Telemetria
+import pe.edu.upeu.pharmamobil.data.firebase.TelemetriaFirebase
 import pe.edu.upeu.pharmamobil.platform.MonitorRedAndroid
 
 actual val platformModule: Module = module {
@@ -31,4 +33,5 @@ actual val platformModule: Module = module {
     } } onClose { it?.close() }
     single<Compartidor> { CompartidorAndroid(androidContext()) }
     single<MonitorRed> { MonitorRedAndroid(androidContext()) }
+    single<Telemetria> { TelemetriaFirebase() }
 }
