@@ -23,7 +23,8 @@ import pe.edu.upeu.pharmamobil.platform.MonitorRedAndroid
 
 actual val platformModule: Module = module {
     single<CreadorDeDriver> { CreadorDeDriverAndroid(androidContext()) }
-    single { ConfiguracionApi("http://10.0.2.2:8080/api/v1/") }
+    // Sesion 14: la URL llega por <meta-data android:name="pharmasoft.url"> del manifest.
+    single { ConfiguracionApi(urlPharmaSoft(androidContext())) }
     single<AlmacenSeguro> { AlmacenSeguroAndroid(androidContext()) }
     single { GestorSesion(get()) }
     single { run {
@@ -34,4 +35,15 @@ actual val platformModule: Module = module {
     single<Compartidor> { CompartidorAndroid(androidContext()) }
     single<MonitorRed> { MonitorRedAndroid(androidContext()) }
     single<Telemetria> { TelemetriaFirebase() }
+}
+
+/** URL del servicio declarada en el manifest; si falta, la del emulador. */
+private fun urlPharmaSoft(contexto: android.content.Context): String {
+    val porDefecto = "http://10.0.2.2:8080/api/v1/"
+    return runCatching {
+        @Suppress("DEPRECATION")
+        contexto.packageManager
+            .getApplicationInfo(contexto.packageName, android.content.pm.PackageManager.GET_META_DATA)
+            .metaData?.getString("pharmasoft.url")
+    }.getOrNull()?.takeIf { it.startsWith("http") } ?: porDefecto
 }

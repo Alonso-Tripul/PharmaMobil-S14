@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sesion 14. PharmaSoft corre en HTTP dentro de la red local del laboratorio
+     (IP variable segun la red), por eso se permite trafico sin cifrar.
+     Limitacion declarada: en produccion el servicio iria por HTTPS y esta
+     linea se quitaria. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
